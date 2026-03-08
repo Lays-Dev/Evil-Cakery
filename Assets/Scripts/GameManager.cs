@@ -1,0 +1,34 @@
+using UnityEngine;
+
+public class GameManager : MonoBehaviour
+{
+    #region Singleton Pattern setup
+    //
+    private static GameManager _instance;
+
+    public static GameManager Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                Debug.LogError("GameManger is NULL");
+            }
+
+            return _instance;
+        }
+    }
+
+    private void Awake()
+    {
+        if(_instance)
+            Destroy(gameObject);
+        else
+            _instance = this;
+
+        DontDestroyOnLoad(this);
+    }
+
+    
+}
+#endregion
