@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System;
+using UnityEngine.UI;
 
 
 #region Class and Variable Declaration
@@ -11,12 +12,15 @@ public class CorporationLevelData
         [SerializeField] private float cost;
         [SerializeField] private float evil;
         [SerializeField] private GameObject button;
-    }
+        [SerializeField] private int paletteIndex;
+}
 #endregion
 
 
 public class ResourceManager : MonoBehaviour
 {
+
+
     
     public Dictionary<string,float> cakeInventory = new Dictionary<string, float>
     {
@@ -32,4 +36,5 @@ public class ResourceManager : MonoBehaviour
     #region Player Upgrades
     public List<CorporationLevelData> CorporationLevels = new List<CorporationLevelData>();
     #endregion
+
 }
