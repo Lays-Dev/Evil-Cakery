@@ -5,10 +5,12 @@ using System;
 
 #region Class and Variable Declaration
 [System.Serializable]
-public class UpgradeData
+public class CorporationLevelData
     {
-        public string upgradeName;
-        public float cost;
+        [SerializeField] private string name;
+        [SerializeField] private float cost;
+        [SerializeField] private float evil;
+        [SerializeField] private GameObject button;
     }
 #endregion
 
@@ -28,6 +30,6 @@ public class ResourceManager : MonoBehaviour
     };
 
     #region Player Upgrades
-    public List<UpgradeData> playerUpgrades = new List<UpgradeData>();
+    public List<CorporationLevelData> CorporationLevels = new List<CorporationLevelData>();
     #endregion
 }
