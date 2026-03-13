@@ -568,10 +568,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9328ebf7c5600743bbf885763d95011, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NewResourceManager
+  upgrades:
+  - name: 
+    cost: 0
+    resourceType: 
+    increaseAmount: 0
+    tier: 0
+    state: 0
+    effect:
+      multiplier: 0
+      targetResource: 0
+  - name: 
+    cost: 0
+    resourceType: 
+    increaseAmount: 0
+    tier: 0
+    state: 0
+    effect:
+      multiplier: 0
+      targetResource: 0
   cakeIncomeAmount: 1
-  cakeIncomeRate: 1
-  moneyIncomeAmount: 2
-  moneyIncomeRate: 2
+  autoCakePerSec: 1
+  moneyIncomeAmount: 3
+  moneyIncomeRate: 1
   CorporationLevels: []
   cakeText: {fileID: 38052178}
   moneyText: {fileID: 1284317336}

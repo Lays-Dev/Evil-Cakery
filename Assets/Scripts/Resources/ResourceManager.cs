@@ -19,8 +19,11 @@ public class CorporationLevelData
 }
 #endregion
 
-public class NewResourceManager : MonoBehaviour
+public class ResourceManager : MonoBehaviour
 {
+
+    public List<Upgrade> upgrades = new List<Upgrade>();
+    
     // RESOURCE STORAGE (Dictionary requirement)
     public Dictionary<string, float> cakeInventory = new Dictionary<string, float>()
     {
@@ -34,7 +37,7 @@ public class NewResourceManager : MonoBehaviour
 
     // Passive Income 
     [SerializeField] private float cakeIncomeAmount = 1f;
-    [SerializeField] private float cakeIncomeRate = 1f;
+    [SerializeField] private float autoCakePerSec = 1f;
 
     [SerializeField] private float moneyIncomeAmount = 2f;
     [SerializeField] private float moneyIncomeRate = 2f;
@@ -69,7 +72,7 @@ public class NewResourceManager : MonoBehaviour
 
             Debug.Log("Cake: " + cakeInventory["Cake"]);
 
-            yield return new WaitForSeconds(cakeIncomeRate);
+            yield return new WaitForSeconds(autoCakePerSec);
         }
     }
 
@@ -146,4 +149,38 @@ public class NewResourceManager : MonoBehaviour
     }
 
     #endregion
+
+    public void PurchaseUpgrade(int index)
+    {
+        if (index >= upgrades.Count) return;
+
+        Upgrade upgrade = upgrades[index];
+
+        if (upgrade.state == UpgradeState.Purchased)
+            return;
+
+        if (moneyInventory["Coin"] >= upgrade.cost)
+        {
+            moneyInventory["Coin"] -= upgrade.cost;
+
+            ApplyUpgradeEffect(upgrade.effect);
+
+            upgrade.state = UpgradeState.Purchased;
+
+            Debug.Log("Purchased Upgrade: " + upgrade.name);
+        }
+    }
+
+    void ApplyUpgradeEffect(UpgradeEffect effect)
+    {
+        if (effect.targetResource == ResourceType.Cake)
+        {
+            cakeIncomeAmount *= effect.multiplier;
+        }
+
+        if (effect.targetResource == ResourceType.Coin)
+        {
+            moneyIncomeAmount *= effect.multiplier;
+        }
+    }
 }

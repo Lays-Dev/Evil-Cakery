@@ -3,7 +3,7 @@ using TMPro;
 
 public class ResourceUI : MonoBehaviour
 {
-    public NewResourceManager resourceManager;
+    public ResourceManager resourceManager;
 
     public TextMeshProUGUI cakeText;
     public TextMeshProUGUI coinText;
