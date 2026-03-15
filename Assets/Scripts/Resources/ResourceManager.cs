@@ -64,6 +64,7 @@ public class ResourceManager : MonoBehaviour
 
     #region Passive Income
 
+// Logic to apply purchased upgrades to income rate ( Assignment Lab9)
     private IEnumerator CakePassiveIncome()
     {
         while (true)
@@ -178,7 +179,7 @@ public class ResourceManager : MonoBehaviour
             cakeIncomeAmount *= effect.multiplier;
         }
 
-        if (effect.targetResource == ResourceType.Coin)
+        if (effect.targetResource == ResourceType.Money)
         {
             moneyIncomeAmount *= effect.multiplier;
         }
