@@ -13,7 +13,7 @@ public class ResourceUI : MonoBehaviour
         if (resourceManager != null)
         {
             cakeText.text = "Cake: " + resourceManager.cakeInventory["Cake"].ToString("F0");
-            coinText.text = "Coin: " + resourceManager.moneyInventory["Coin"].ToString("F0");
+            coinText.text = "Money: " + resourceManager.moneyInventory["Money"].ToString("F0");
         }
     }
 }

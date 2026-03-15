@@ -1,0 +1,34 @@
+LAB 9
+
+Added ResourceType.cs
+> Enum
+> Cake, Money
+> Will tell the game what resource an action will affect
+
+Added UpgradeState.cs
+> Enum
+> Locked, Available, Unpurchased, Purchased 
+> Will tell the game what actions can be applied to the upgrade
+
+Added UpgradeEffect.cs
+> Struct
+> This is the action that will be taken on the resource 
+
+Added Upgrade.cs
+> Class
+> This is all the information for each upgrade
+
+Updated ResourceManager.cs
+> Added list variable
+> Added PurchaseUpgrade function
+> Added ApplyUpgradeEffect function
+> Updated inspector with values
+> Updated inspector with Game Objects
+
+Created an upgrade button
+> Added On click 
+> Added Game Manager Game Object
+> Temporary text
+> Upgrade the auto click once by spending $10
+> Upgrade the auto click twice by spending $100
+

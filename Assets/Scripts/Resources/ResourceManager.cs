@@ -3,22 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 
-#region Class and Variable Declaration
-[System.Serializable]
-public class CorporationLevelData
-{
-    [SerializeField] public string name;
-    [SerializeField] public float cost;
-    [SerializeField] public float evil;
-
-    [SerializeField] public GameObject button;
-    [SerializeField] public int paletteIndex;
-
-    [SerializeField] public string resourceType;
-    [SerializeField] public float incomeIncrease;
-}
-#endregion
-
 public class ResourceManager : MonoBehaviour
 {
 
@@ -32,7 +16,7 @@ public class ResourceManager : MonoBehaviour
 
     public Dictionary<string, float> moneyInventory = new Dictionary<string, float>()
     {
-        { "Coin", 0 }
+        { "Money", 0 }
     };
 
     // Passive Income 
@@ -41,10 +25,6 @@ public class ResourceManager : MonoBehaviour
 
     [SerializeField] private float moneyIncomeAmount = 2f;
     [SerializeField] private float moneyIncomeRate = 2f;
-
-    #region Player Upgrades
-    public List<CorporationLevelData> CorporationLevels = new List<CorporationLevelData>();
-    #endregion
 
     // UI
     [Header("UI")]
@@ -64,7 +44,7 @@ public class ResourceManager : MonoBehaviour
 
     #region Passive Income
 
-// Logic to apply purchased upgrades to income rate ( Assignment Lab9)
+    // Logic to apply purchased upgrades to income rate ( Assignment Lab9)
     private IEnumerator CakePassiveIncome()
     {
         while (true)
@@ -81,9 +61,9 @@ public class ResourceManager : MonoBehaviour
     {
         while (true)
         {
-            moneyInventory["Coin"] += moneyIncomeAmount;
+            moneyInventory["Money"] += moneyIncomeAmount;
 
-            Debug.Log("Money: " + moneyInventory["Coin"]);
+            Debug.Log("Money: " + moneyInventory["Money"]);
 
             yield return new WaitForSeconds(moneyIncomeRate);
         }
@@ -102,54 +82,14 @@ public class ResourceManager : MonoBehaviour
 
     public void ClickMoney()
     {
-        moneyInventory["Coin"] += 5;
+        moneyInventory["Money"] += 5;
 
-        Debug.Log("Clicked Coin: " + moneyInventory["Coin"]);
+        Debug.Log("Clicked Money: " + moneyInventory["Money"]);
     }
 
     #endregion
 
     #region Upgrade System
-
-    public void BuyUpgrade(int index)
-    {
-        if (index >= CorporationLevels.Count)
-            return;
-
-        CorporationLevelData upgrade = CorporationLevels[index];
-
-        if (moneyInventory["Coin"] >= upgrade.cost)
-        {
-            moneyInventory["Coin"] -= upgrade.cost;
-
-            if (upgrade.resourceType == "Cake")
-            {
-                cakeIncomeAmount += upgrade.incomeIncrease;
-            }
-
-            if (upgrade.resourceType == "Coin")
-            {
-                moneyIncomeAmount += upgrade.incomeIncrease;
-            }
-
-            Debug.Log("Upgrade Purchased: " + upgrade.name);
-        }
-    }
-
-    #endregion
-
-    #region UI
-
-    private void UpdateUI()
-    {
-        if (cakeText != null)
-            cakeText.text = "Cake: " + cakeInventory["Cake"].ToString("F0");
-
-        if (moneyText != null)
-            moneyText.text = "Coin: " + moneyInventory["Coin"].ToString("F0");
-    }
-
-    #endregion
 
     public void PurchaseUpgrade(int index)
     {
@@ -160,9 +100,9 @@ public class ResourceManager : MonoBehaviour
         if (upgrade.state == UpgradeState.Purchased)
             return;
 
-        if (moneyInventory["Coin"] >= upgrade.cost)
+        if (moneyInventory["Money"] >= upgrade.cost)
         {
-            moneyInventory["Coin"] -= upgrade.cost;
+            moneyInventory["Money"] -= upgrade.cost;
 
             ApplyUpgradeEffect(upgrade.effect);
 
@@ -184,4 +124,19 @@ public class ResourceManager : MonoBehaviour
             moneyIncomeAmount *= effect.multiplier;
         }
     }
+
+    #endregion
+
+    #region UI
+
+    private void UpdateUI()
+    {
+        if (cakeText != null)
+            cakeText.text = "Cake: " + cakeInventory["Cake"].ToString("F0");
+
+        if (moneyText != null)
+            moneyText.text = "Money: " + moneyInventory["Money"].ToString("F0");
+    }
+
+    #endregion
 }
