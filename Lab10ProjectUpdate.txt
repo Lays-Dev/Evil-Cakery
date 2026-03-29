@@ -1,0 +1,6 @@
+Lab 10 Update:
+
+https://youtu.be/7-PsHf5QEPg
+
+- Created a base Generator class to create different types of resources over time
+- Create a Generator for Cakes and a Generator for Loyalty
