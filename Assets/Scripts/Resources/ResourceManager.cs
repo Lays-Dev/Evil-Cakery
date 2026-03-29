@@ -5,8 +5,11 @@ using TMPro;
 
 public class ResourceManager : MonoBehaviour
 {
+    public List<Generator> generators = new List<Generator>();
 
     public List<Upgrade> upgrades = new List<Upgrade>();
+
+    #region Dictionary
     
     // RESOURCE STORAGE (Dictionary requirement)
     public Dictionary<string, float> cakeInventory = new Dictionary<string, float>()
@@ -16,8 +19,11 @@ public class ResourceManager : MonoBehaviour
 
     public Dictionary<string, float> moneyInventory = new Dictionary<string, float>()
     {
-        { "Money", 0 }
+        { "Money", 0 },
+        { "Loyalty", 0 }
     };
+
+    #endregion
 
     // Passive Income 
     [SerializeField] private float cakeIncomeAmount = 1f;
@@ -25,6 +31,7 @@ public class ResourceManager : MonoBehaviour
 
     [SerializeField] private float moneyIncomeAmount = 2f;
     [SerializeField] private float moneyIncomeRate = 2f;
+    private bool loyaltyUnlocked = false;
 
     // UI
     [Header("UI")]
@@ -34,7 +41,8 @@ public class ResourceManager : MonoBehaviour
     private void Start()
     {
         StartCoroutine(CakePassiveIncome());
-        StartCoroutine(MoneyPassiveIncome());
+        StartCoroutine(SellCakes());
+        StartCoroutine(LoyaltyPassiveIncome());
     }
 
     private void Update()
@@ -49,23 +57,73 @@ public class ResourceManager : MonoBehaviour
     {
         while (true)
         {
-            cakeInventory["Cake"] += cakeIncomeAmount;
+            float cake = cakeInventory["Cake"];
 
-            Debug.Log("Cake: " + cakeInventory["Cake"]);
+            foreach (Generator gen in generators)
+            {
+                if (gen is CakeGenerator)
+                {
+                    gen.Produce(ref cake);
+                }
+            }
+
+            cakeInventory["Cake"] = cake;
 
             yield return new WaitForSeconds(autoCakePerSec);
         }
     }
 
-    private IEnumerator MoneyPassiveIncome()
+    // Cake selling logic 
+    private IEnumerator SellCakes()
     {
         while (true)
         {
-            moneyInventory["Money"] += moneyIncomeAmount;
+            float cakes = cakeInventory["Cake"];
 
-            Debug.Log("Money: " + moneyInventory["Money"]);
+            if (cakes > 0)
+            {
 
-            yield return new WaitForSeconds(moneyIncomeRate);
+                // Loyalty makes selling faster
+                float sellAmount = 1f + moneyInventory["Loyalty"];
+
+                // Clamp so we don't sell more than we have
+                sellAmount = Mathf.Min(sellAmount, cakes);
+
+                cakeInventory["Cake"] -= sellAmount;
+
+                // Convert to money
+                moneyInventory["Money"] += sellAmount * 2f;
+
+                Debug.Log("Sold Cakes: " + sellAmount);
+            }
+
+            yield return new WaitForSeconds(1f);
+        }
+    }
+
+    private IEnumerator LoyaltyPassiveIncome()
+    {
+        while (true)
+        {
+            if (!loyaltyUnlocked)
+            {
+                yield return null;
+                continue;
+            }
+
+            float loyalty = moneyInventory["Loyalty"];
+
+            foreach (Generator gen in generators)
+            {
+                if (gen is LoyaltyGenerator)
+                {
+                    gen.Produce(ref loyalty);
+                }
+            }
+
+            moneyInventory["Loyalty"] = loyalty;
+
+            yield return new WaitForSeconds(1f);
         }
     }
 
@@ -91,25 +149,41 @@ public class ResourceManager : MonoBehaviour
 
     #region Upgrade System
 
-    public void PurchaseUpgrade(int index)
+    public void PurchaseUpgrade(int index, out bool success, out string message)
     {
-        if (index >= upgrades.Count) return;
+        success = false;
+        message = "";
+
+        if (index >= upgrades.Count)
+        {
+            message = "Invalid upgrade index";
+            return;
+        }
 
         Upgrade upgrade = upgrades[index];
 
         if (upgrade.state == UpgradeState.Purchased)
-            return;
-
-        if (moneyInventory["Money"] >= upgrade.cost)
         {
-            moneyInventory["Money"] -= upgrade.cost;
-
-            ApplyUpgradeEffect(upgrade.effect);
-
-            upgrade.state = UpgradeState.Purchased;
-
-            Debug.Log("Purchased Upgrade: " + upgrade.name);
+            message = "Already purchased";
+            return;
         }
+
+        if (moneyInventory["Money"] < upgrade.cost)
+        {
+            message = "Not enough money";
+            return;
+        }
+
+        moneyInventory["Money"] -= upgrade.cost;
+
+        ApplyUpgradeEffect(upgrade.effect);
+
+        upgrade.state = UpgradeState.Purchased;
+
+        success = true;
+        message = "Upgrade purchased: " + upgrade.name;
+
+        Debug.Log(message);
     }
 
     void ApplyUpgradeEffect(UpgradeEffect effect)
@@ -122,6 +196,11 @@ public class ResourceManager : MonoBehaviour
         if (effect.targetResource == ResourceType.Money)
         {
             moneyIncomeAmount *= effect.multiplier;
+        }
+
+        if (effect.targetResource == ResourceType.Loyalty)
+        {
+            loyaltyUnlocked = true;
         }
     }
 
@@ -136,6 +215,17 @@ public class ResourceManager : MonoBehaviour
 
         if (moneyText != null)
             moneyText.text = "Money: " + moneyInventory["Money"].ToString("F0");
+    }
+
+    public void PurchaseUpgradeButton(int index)
+    {
+        bool success;
+        string message;
+
+        PurchaseUpgrade(index, out success, out message);
+
+        Debug.Log(message);
+        Debug.Log("Button Pressed: " + index);
     }
 
     #endregion

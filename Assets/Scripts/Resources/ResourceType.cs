@@ -2,5 +2,6 @@
 public enum ResourceType
 {
     Cake,
+    Loyalty,
     Money
 }
