@@ -2,6 +2,8 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using System.IO;
+using System.Xml.Serialization;
 
 public class ResourceManager : MonoBehaviour
 {
@@ -38,8 +40,13 @@ public class ResourceManager : MonoBehaviour
     public TextMeshProUGUI cakeText;
     public TextMeshProUGUI moneyText;
 
+    // Save/Load
+    [SerializeField] private float sessionTime = 0f;
+
     private void Start()
     {
+        LoadGame();
+        LoadUpgradesFromJSON();
         StartCoroutine(CakePassiveIncome());
         StartCoroutine(SellCakes());
         StartCoroutine(LoyaltyPassiveIncome());
@@ -48,6 +55,7 @@ public class ResourceManager : MonoBehaviour
     private void Update()
     {
         UpdateUI();
+        sessionTime += Time.deltaTime;
     }
 
     #region Passive Income
@@ -226,6 +234,100 @@ public class ResourceManager : MonoBehaviour
 
         Debug.Log(message);
         Debug.Log("Button Pressed: " + index);
+    }
+
+    #endregion
+
+    #region Save/Load
+
+    void LoadUpgradesFromJSON()
+    {
+        string path = Path.Combine(Application.streamingAssetsPath, "upgrades.json");
+
+        if (File.Exists(path))
+        {
+            string json = File.ReadAllText(path);
+
+            UpgradeDataList dataList = JsonUtility.FromJson<UpgradeDataList>(json);
+
+            upgrades.Clear();
+
+            foreach (var data in dataList.upgrades)
+            {
+                Upgrade newUpgrade = new Upgrade();
+
+                newUpgrade.name = data.name;
+                newUpgrade.cost = data.cost;
+                newUpgrade.tier = data.tier;
+                newUpgrade.state = UpgradeState.Available;
+
+                newUpgrade.effect = new UpgradeEffect
+                {
+                    multiplier = data.multiplier,
+                    targetResource = (ResourceType)data.targetResource
+                };
+
+                upgrades.Add(newUpgrade);
+            }
+
+            Debug.Log("Upgrades loaded from JSON");
+        }
+    }
+
+    void SaveGame()
+    {
+        SaveData data = new SaveData();
+
+        data.cake = cakeInventory["Cake"];
+        data.money = moneyInventory["Money"];
+        data.loyalty = moneyInventory["Loyalty"];
+
+        string path = Path.Combine(Application.persistentDataPath, "save.xml");
+
+        XmlSerializer serializer = new XmlSerializer(typeof(SaveData));
+        FileStream stream = new FileStream(path, FileMode.Create);
+
+        serializer.Serialize(stream, data);
+        stream.Close();
+
+        Debug.Log("Game Saved");
+    }
+
+    void LoadGame()
+    {
+        string path = Path.Combine(Application.persistentDataPath, "save.xml");
+
+        if (File.Exists(path))
+        {
+            XmlSerializer serializer = new XmlSerializer(typeof(SaveData));
+            FileStream stream = new FileStream(path, FileMode.Open);
+
+            SaveData data = serializer.Deserialize(stream) as SaveData;
+            stream.Close();
+
+            cakeInventory["Cake"] = data.cake;
+            moneyInventory["Money"] = data.money;
+            moneyInventory["Loyalty"] = data.loyalty;
+
+            Debug.Log("Game Loaded");
+        }
+    }
+
+    void OnApplicationQuit()
+    {
+        SaveGame();
+        SavePlaytime();
+    }
+
+    void SavePlaytime()
+    {
+        string path = Path.Combine(Application.persistentDataPath, "playtime.txt");
+
+        string timeEntry = "Session Time: " + sessionTime.ToString("F2") + " seconds\n";
+        // Append the session time to the file
+        File.AppendAllText(path, timeEntry);
+
+        Debug.Log("Playtime Saved");
     }
 
     #endregion
