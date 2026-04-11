@@ -1,0 +1,18 @@
+{
+  "upgrades": [
+    {
+      "name": "Cake Auto Clicker",
+      "cost": 20,
+      "tier": 1,
+      "multiplier": 2,
+      "targetResource": 0
+    },
+    {
+      "name": "Loyalty Program",
+      "cost": 50,
+      "tier": 1,
+      "multiplier": 1,
+      "targetResource": 2
+    }
+  ]
+}
